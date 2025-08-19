@@ -16,16 +16,31 @@ import SocialCallback from "./pages/SocialCallback";
 export default function App() {
   /** Root application with routes for auth, profile, and privacy. */
   const [theme, setTheme] = useState("light");
+
+  // Apply theme to <html>
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
+  // Set background image CSS variable from env or fallback to a royalty-free cinematic image
+  useEffect(() => {
+    const fallback =
+      "https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=1920&q=80";
+    const bg = process.env.REACT_APP_BG_IMAGE_URL || fallback;
+    // Expose as CSS var for styling layers
+    document.documentElement.style.setProperty("--app-bg-image", `url('${bg}')`);
+  }, []);
 
   const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
 
   return (
     <div className="App">
+      {/* Background layers */}
+      <div className="bg-root" role="img" aria-label="Cinematic background" />
+      <div className="bg-overlay" aria-hidden="true" />
+
       <Navbar theme={theme} onToggleTheme={toggleTheme} />
-      <main className="main">
+      <main className="main content">
         <Routes>
           <Route
             path="/"
