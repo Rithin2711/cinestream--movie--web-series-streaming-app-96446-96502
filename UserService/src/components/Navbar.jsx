@@ -22,14 +22,9 @@ export default function Navbar({ theme, onToggleTheme }) {
         >
           {theme === "light" ? "🌙 Dark" : "☀️ Light"}
         </button>
-        {!user ? (
-          <>
-            <NavLink to="/login" className="btn">Login</NavLink>
-            <NavLink to="/register" className="btn btn-outline">Register</NavLink>
-          </>
-        ) : (
+        {user ? (
           <button className="btn btn-danger" onClick={logout}>Logout</button>
-        )}
+        ) : null}
       </div>
     </nav>
   );
