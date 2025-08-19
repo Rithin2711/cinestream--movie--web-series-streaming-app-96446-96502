@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import BackButton from "../components/BackButton";
 
 // PUBLIC_INTERFACE
 export default function SocialCallback() {
@@ -31,6 +32,9 @@ export default function SocialCallback() {
 
   return (
     <div className="container">
+      <div className="back-row">
+        <BackButton to="/login" />
+      </div>
       <h1 className="title">Social Login</h1>
       <div className="card">
         <p>{message}</p>

@@ -300,3 +300,7 @@ a:hover { opacity: 0.95; }
 
 /* Ensure content sits above background layers */
 .content, .navbar, .footer { position: relative; z-index: 1; }
+
+/* BACK ACTIONS */
+.back-row { margin-bottom: 12px; }
+.back-row .btn { padding: 10px 12px; }

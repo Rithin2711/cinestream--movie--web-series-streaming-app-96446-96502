@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import BackButton from "../components/BackButton";
 import { getSocialLoginUrl } from "../api/client";
 
 // PUBLIC_INTERFACE
@@ -71,6 +72,9 @@ export default function Login() {
 
   return (
     <div className="container">
+      <div className="back-row">
+        <BackButton />
+      </div>
       <h1 className="title">Welcome back</h1>
       <p className="subtitle">Log in to your CineStream account</p>
 
