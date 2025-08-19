@@ -1,8 +1,19 @@
-
 import axios from "axios";
 import { getAuth, setAuth, clearAuth } from "../utils/storage";
 
-const BASE_URL = process.env.REACT_APP_USERSERVICE_API_URL || "";
+// Normalize base URL (remove trailing slashes) for safe path joining.
+// If not provided, keep empty string so CRA dev proxy can handle relative paths.
+const RAW_BASE_URL = (process.env.REACT_APP_USERSERVICE_API_URL || "").trim();
+const BASE_URL = RAW_BASE_URL ? RAW_BASE_URL.replace(/\/+$/, "") : "";
+
+/**
+ * Safely join a base URL and a path, avoiding double slashes.
+ * If base is empty, ensures the path starts with a single leading slash.
+ */
+function joinUrl(base, path) {
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return base ? `${base}${p}` : p;
+}
 
 /**
  - PUBLIC_INTERFACE
@@ -10,7 +21,8 @@ const BASE_URL = process.env.REACT_APP_USERSERVICE_API_URL || "";
  - This instance adds Authorization headers when an access_token is stored.
 */
 export const api = axios.create({
-  baseURL: BASE_URL,
+  // Use relative baseURL when BASE_URL is empty so CRA setupProxy can forward requests in dev.
+  baseURL: BASE_URL || "",
   headers: {
     "Content-Type": "application/json",
   },
@@ -29,23 +41,25 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const original = error.config;
+    const original = error.config || {};
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
       const { refresh_token } = getAuth();
       if (refresh_token) {
         try {
-          const res = await axios.post(`${BASE_URL}/auth/refresh`, {
+          // Use global axios (not the instance) to avoid interceptor recursion.
+          const res = await axios.post(joinUrl(BASE_URL, "/auth/refresh"), {
             refresh_token,
           });
           const { access_token: newAccess, refresh_token: newRefresh, user } = res.data || {};
           if (newAccess) {
             setAuth({ access_token: newAccess, refresh_token: newRefresh || refresh_token, user });
+            original.headers = original.headers || {};
             original.headers.Authorization = `Bearer ${newAccess}`;
             return api(original);
           }
         } catch {
-          // fall through to logout
+          // fall through to logout on refresh failure
         }
       }
       clearAuth();
@@ -100,7 +114,8 @@ export function getSocialLoginUrl(provider) {
   const siteUrl = process.env.REACT_APP_SITE_URL || window.location.origin;
   // e.g., backend should use this redirect URL to send back the auth code
   const redirect = encodeURIComponent(`${siteUrl}/auth/callback/${provider}`);
-  return `${BASE_URL}/auth/social/${provider}/login?redirect_uri=${redirect}`;
+  const loginPath = `/auth/social/${provider}/login`;
+  return `${joinUrl(BASE_URL, loginPath)}?redirect_uri=${redirect}`;
 }
 
 // PUBLIC_INTERFACE

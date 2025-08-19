@@ -27,6 +27,20 @@ Launches the test runner in interactive watch mode.
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
+## API Configuration and Dev Proxy (Important)
+
+This app calls backend endpoints under `/auth/*` and `/users/*`. To avoid 404 errors:
+
+- Development (recommended):
+  - Do not set `REACT_APP_USERSERVICE_API_URL` (or leave it empty).
+  - Set `USERSERVICE_API_PROXY_TARGET` to your backend URL (e.g., `http://localhost:8000`).
+  - The included `src/setupProxy.js` will forward `/auth` and `/users` to your backend.
+- Production:
+  - Set `REACT_APP_USERSERVICE_API_URL` to the backend base URL (e.g., `https://api.cinestream.example`).
+  - Build and deploy. Requests will be made directly to that URL.
+
+See `.env.example` for all relevant variables.
+
 ## Customization
 
 ### Colors
