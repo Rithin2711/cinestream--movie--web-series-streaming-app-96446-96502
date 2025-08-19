@@ -1,1 +1,3 @@
-# cinestream--movie--web-series-streaming-app-96446-96502
+# Project Repository
+
+This is the initial README file for the project.
